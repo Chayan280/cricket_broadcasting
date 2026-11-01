@@ -1,0 +1,19 @@
+:root {
+  --navy-950: #071626;
+  --navy-900: #0a1f35;
+  --navy-800: #10304e;
+  --navy-700: #17446b;
+  --line: #25557f;
+  --ink: #ebf3f9;
+  --ink-dim: #93aec4;
+  --ball: #c8283b;
+  --ball-hot: #e5384c;
+  --gold: #f0b429;
+  --cyan: #35c0e8;
+  --green: #2da36b;
+  --purple: #a259ff;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --font-body: 'Barlow', system-ui, sans-serif;
+  --r-s: 4px;
+  --r-m: 10px;
+}

@@ -1,0 +1,36 @@
+# One command for the whole stack:  docker compose up --build
+# Open http://<this-laptop-ip>  from any device on the same Wi-Fi / LAN.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cricket
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cricket}
+      POSTGRES_DB: cricket
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cricket"]
+      interval: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://cricket:${POSTGRES_PASSWORD:-cricket}@db:5432/cricket
+      ADMIN_PIN: ${ADMIN_PIN:-1234}
+      COMMENTATOR_PIN: ${COMMENTATOR_PIN:-5678}
+      CORS_ORIGINS: "*"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

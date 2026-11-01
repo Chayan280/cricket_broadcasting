@@ -1,0 +1,55 @@
+.btn {
+  font: 600 1rem var(--font-body); color: var(--ink); background: var(--navy-700);
+  border: 1px solid var(--line); border-radius: var(--r-s); padding: 0.55rem 1rem; cursor: pointer;
+  transition: background 0.15s, transform 0.05s;
+}
+.btn:hover:not(:disabled) { background: var(--line); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn.primary { background: var(--ball); border-color: var(--ball-hot); }
+.btn.primary:hover:not(:disabled) { background: var(--ball-hot); }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 0.25rem 0.6rem; font-size: 0.85rem; }
+.btn.danger { border-color: var(--ball-hot); color: #ffb3bc; background: transparent; }
+
+input, select, textarea {
+  font: 500 1rem var(--font-body); color: var(--ink); background: var(--navy-950);
+  border: 1px solid var(--line); border-radius: var(--r-s); padding: 0.5rem 0.65rem; width: 100%;
+}
+textarea { resize: vertical; min-height: 7rem; }
+label.field { display: grid; gap: 0.25rem; font-size: 0.85rem; color: var(--ink-dim); }
+
+.panel { background: color-mix(in srgb, var(--navy-900) 88%, transparent); border: 1px solid var(--line); border-radius: var(--r-m); padding: 1rem; }
+.panel > h3 { margin-bottom: 0.75rem; }
+.error { color: #ffb3bc; background: color-mix(in srgb, var(--ball) 25%, transparent); border-left: 3px solid var(--ball-hot); padding: 0.5rem 0.75rem; border-radius: var(--r-s); }
+
+.conn { font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem; color: var(--ink-dim); }
+.conn::before { content: ''; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--ball-hot); }
+.conn.on::before { background: var(--green); }
+
+.loader { display: grid; place-items: center; height: 40vh; color: var(--ink-dim); }
+
+.modal-back { position: fixed; inset: 0; background: rgba(3, 10, 18, 0.72); display: grid; place-items: center; z-index: 50; padding: 1rem; }
+.modal { width: min(560px, 100%); max-height: 90vh; overflow: auto; background: var(--navy-900); border: 1px solid var(--line); border-radius: var(--r-m); padding: 1.25rem; }
+.modal h2 { margin-bottom: 1rem; }
+.modal .actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+
+/* ball chips: the red ones carry a stitched seam */
+.chip { display: inline-grid; place-items: center; min-width: 2rem; height: 2rem; padding: 0 0.35rem; border-radius: 999px; font: 700 0.95rem var(--font-display); border: 2px solid var(--navy-700); color: var(--ink); background: var(--navy-800); }
+.chip.dot { color: var(--ink-dim); }
+.chip.four { background: var(--green); border-color: var(--green); }
+.chip.six { background: var(--purple); border-color: var(--purple); }
+.chip.wicket { background: var(--ball); border: 2px dashed #f6e7e3; }
+.chip.wide, .chip.noball { border-color: var(--gold); color: var(--gold); }
+.chip.bye, .chip.legbye { border-color: var(--cyan); color: var(--cyan); }
+
+.pin-gate { max-width: 360px; margin: 18vh auto; display: grid; gap: 0.75rem; }
+
+.top-bar { display: flex; align-items: center; gap: 1.25rem; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--line); background: var(--navy-950); }
+.brand { font: 700 1.5rem var(--font-display); display: flex; align-items: center; gap: 0.5rem; color: var(--ink); }
+.brand i { width: 1.1rem; height: 1.1rem; border-radius: 50%; background: var(--ball); box-shadow: inset 0 0 0 2px #f6e7e3; display: inline-block; }
+.page { padding: 1.25rem 1.5rem 3rem; max-width: 1500px; margin: 0 auto; }
+
+.home-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); margin-top: 1rem; }
+.match-card h3 { font-size: 1.4rem; }
+.match-card .links { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; margin-top: 0.75rem; }

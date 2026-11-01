@@ -1,0 +1,31 @@
+.studio { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 58px); }
+@media (max-width: 800px) { .studio { grid-template-columns: 1fr; } }
+.studio-side { background: var(--navy-950); border-right: 1px solid var(--line); padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.chart-opt { text-align: left; border: 1px solid var(--navy-700); background: var(--navy-900); color: var(--ink); border-radius: var(--r-s); padding: 0.65rem 0.8rem; cursor: pointer; font-family: var(--font-body); position: relative; }
+.chart-opt strong { display: block; font: 600 1.15rem var(--font-display); }
+.chart-opt span { font-size: 0.82rem; color: var(--ink-dim); }
+.chart-opt:hover { border-color: var(--cyan); }
+.chart-opt.live { border-color: var(--ball-hot); background: color-mix(in srgb, var(--ball) 28%, var(--navy-900)); }
+.chart-opt.live::after { content: 'ON AIR'; position: absolute; right: 0.6rem; top: 0.6rem; font: 700 0.7rem var(--font-body); background: var(--ball-hot); padding: 0.1rem 0.4rem; border-radius: 3px; }
+.studio-main { padding: 1.25rem; display: grid; gap: 1rem; align-content: start; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-s); overflow: hidden; }
+.seg button { background: transparent; color: var(--ink-dim); border: 0; padding: 0.4rem 0.8rem; cursor: pointer; font: 600 0.9rem var(--font-body); }
+.seg button.active { background: var(--cyan); color: #04202c; }
+.preview-wrap { position: relative; }
+.preview-wrap.off .chart-panel { opacity: 0.45; filter: grayscale(0.6); }
+
+.chart-panel { background: color-mix(in srgb, var(--navy-950) 94%, transparent); border: 1px solid var(--line); border-top: 4px solid var(--ball); border-radius: 4px 24px 4px 24px; padding: 1rem 1.4rem 1.2rem; box-shadow: 0 14px 50px rgba(0, 0, 0, 0.5); }
+.chart-panel header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; }
+.chart-panel header h2 { font-size: 2rem; }
+.chart-panel header .dim { font: 500 1.15rem var(--font-display); }
+.chart-body { height: var(--chart-h, 360px); }
+.chart-empty { height: 100%; display: grid; place-items: center; color: var(--ink-dim); }
+.legend-note { display: flex; gap: 1rem; font-size: 0.9rem; color: var(--ink-dim); }
+
+/* transparent overlay output */
+.overlay-stage { min-height: 100vh; display: flex; align-items: center; padding: 4vh 3vw; --chart-h: 52vh; }
+.overlay-stage.pos-left { justify-content: flex-start; }
+.overlay-stage.pos-center { justify-content: center; }
+.overlay-stage.pos-right { justify-content: flex-end; }
+.overlay-stage .chart-panel { width: min(62vw, 1100px); animation: slide-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+@keyframes slide-in { from { opacity: 0; transform: translateY(24px) scale(0.98); } to { opacity: 1; transform: none; } }
