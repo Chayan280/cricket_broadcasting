@@ -1,119 +1,237 @@
 # Cricket Live
 
-Live cricket scoring + broadcast overlays. Ek laptop pe server chalta hai, baaki laptops browser se connect hote hain.
+A live cricket scoring and broadcast overlay system. One laptop runs the server, while other laptops can connect through their browsers.
 
-| Page | URL | Kaun use karega |
+| Page | URL | Who will use it |
 |---|---|---|
-| Scorer / admin | `/admin` → `/admin/matches/:id` | Scorer (PIN chahiye). **Stream mein nahi dikhana** |
-| Public scoreboard | `/scoreboard/:id` (`?view=full` = poora scorecard) | Live stream. OBS ke liye `?bg=transparent` |
-| Charts studio | `/charts/:id` | Commentator (PIN). Left side se chart click = stream pe aa jata hai |
-| Chart overlay (output) | `/overlay/:id` | OBS browser source. Transparent, commentator ke choice ko follow karta hai |
+| Scorer / Admin | `/admin` → `/admin/matches/:id` | Scorer (PIN required). **Must not appear on the live stream.** |
+| Public Scoreboard | `/scoreboard/:id` (`?view=full` = complete scorecard) | Live stream. Use `?bg=transparent` for OBS. |
+| Charts Studio | `/charts/:id` | Commentator (PIN required). Clicking a chart on the left displays it on the live stream. |
+| Chart Overlay (Output) | `/overlay/:id` | OBS Browser Source. Transparent background; automatically follows the commentator's selected chart. |
 
-Admin mein jo bhi change hota hai (ball add / edit / delete / undo) wo WebSocket se sab pages pe turant update ho jata hai.
+Any changes made in the Admin panel (adding, editing, deleting a ball, or undoing an action) are instantly synchronized across all pages through WebSockets.
 
-## Stack
-- **Frontend**: React 18 + Vite + React Router + Recharts
-- **Backend**: Python, FastAPI, SQLAlchemy, **pandas + numpy** (chart data)
-- **DB**: PostgreSQL (localhost). Quick trial ke liye SQLite bhi chalega
-- **Live updates**: WebSocket (`/ws/matches/:id`)
+## Technology Stack
 
-## Folder structure
-```
+- **Frontend:** React 18 + Vite + React Router + Recharts
+- **Backend:** Python, FastAPI, SQLAlchemy, **pandas + numpy** (for chart data)
+- **Database:** PostgreSQL (localhost). SQLite is also supported for quick testing.
+- **Live Updates:** WebSocket (`/ws/matches/:id`)
+
+## Project Folder Structure
+
+```text
 cricket-live/
-├─ backend/
-│  ├─ app/
-│  │  ├─ main.py                  # FastAPI app, CORS, startup
-│  │  ├─ core/                    # config (.env), PIN security
-│  │  ├─ db/session.py            # engine + session
-│  │  ├─ models/                  # Match, Player, Innings, Delivery
-│  │  ├─ schemas/                 # request bodies
-│  │  ├─ services/
-│  │  │  ├─ scoring_engine.py     # ALL cricket rules (pure python, tested)
-│  │  │  ├─ match_service.py      # DB <-> engine, builds live state
-│  │  │  ├─ analytics_service.py  # pandas/numpy chart data
-│  │  │  ├─ overlay_service.py    # which chart is on air
-│  │  │  └─ realtime.py           # websocket rooms
-│  │  └─ api/routes/              # auth, matches, scoring, analytics, overlay, ws
-│  └─ tests/                      # engine + API + websocket tests
-├─ frontend/src/
-│  ├─ routes/  layouts/  pages/  components/{admin,scoreboard,charts,common}/
-│  ├─ api/  hooks/  utils/  styles/  config/
-├─ scripts/  seed_demo.py, lan_ip.py
-└─ docker-compose.yml
+├── backend/
+│   ├── app/
+│   │   ├── main.py                  # FastAPI app, CORS, startup
+│   │   ├── core/                    # Configuration (.env), PIN security
+│   │   ├── db/session.py            # Database engine and session
+│   │   ├── models/                  # Match, Player, Innings, Delivery
+│   │   ├── schemas/                 # Request and response schemas
+│   │   ├── services/
+│   │   │   ├── scoring_engine.py    # All cricket rules (pure Python, tested)
+│   │   │   ├── match_service.py     # Database integration and live state
+│   │   │   ├── analytics_service.py # pandas/numpy chart data
+│   │   │   ├── overlay_service.py   # Manages the active broadcast chart
+│   │   │   └── realtime.py          # WebSocket rooms
+│   │   └── api/routes/              # Auth, matches, scoring, analytics, overlay, WS
+│   └── tests/                       # Engine, API, and WebSocket tests
+├── frontend/src/
+│   ├── routes/
+│   ├── layouts/
+│   ├── pages/
+│   ├── components/
+│   │   ├── admin/
+│   │   ├── scoreboard/
+│   │   ├── charts/
+│   │   └── common/
+│   ├── api/
+│   ├── hooks/
+│   ├── utils/
+│   ├── styles/
+│   └── config/
+├── scripts/
+│   ├── seed_demo.py
+│   └── lan_ip.py
+└── docker-compose.yml
 ```
 
-## Local run (Windows / Linux / Mac)
+## Local Setup (Windows / Linux / macOS)
 
-### 1) PostgreSQL (ek baar)
+### 1. PostgreSQL Setup (One-Time)
+
 ```sql
--- psql -U postgres
+-- Connect using: psql -U postgres
+
 CREATE USER cricket WITH PASSWORD 'cricket';
 CREATE DATABASE cricket OWNER cricket;
 ```
-(Postgres nahi chahiye abhi? `backend/.env` mein `DATABASE_URL=sqlite:///./cricket.db` daal do.)
 
-### 2) Backend
+If you don't want to use PostgreSQL yet, add the following to `backend/.env`:
+
+```env
+DATABASE_URL=sqlite:///./cricket.db
+```
+
+### 2. Backend Setup
+
 ```bash
 cd backend
+
 python -m venv venv
-venv\Scripts\activate          # Linux/Mac: source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
+
+# Linux / macOS
+source venv/bin/activate
+
 pip install -r requirements.txt
-copy .env.example .env         # Linux/Mac: cp .env.example .env   (PIN yahan badlo)
+
+# Windows
+copy .env.example .env
+
+# Linux / macOS
+cp .env.example .env
+
+# Change the PIN in the .env file.
+
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
-Tables pehli baar start pe khud ban jate hain.
 
-### 3) Frontend
+Database tables are automatically created when the application starts for the first time.
+
+### 3. Frontend Setup
+
 ```bash
 cd frontend
+
 npm install
-npm run dev                    # http://localhost:5173 , LAN pe bhi khula hai
+
+npm run dev
 ```
 
-### 4) Demo data (optional)
+Frontend URL: `http://localhost:5173`
+
+The development server is also accessible over the local network.
+
+### 4. Demo Data (Optional)
+
 ```bash
-python scripts/seed_demo.py    # ek poora random match khel deta hai, charts turant dikh jate hain
+python scripts/seed_demo.py
 ```
 
-## 3-4 laptops ek saath (LAN)
-Haan, possible hai. Server laptop pe `python scripts/lan_ip.py` chalao, wo URLs print kar dega (e.g. `http://192.168.1.10:5173/admin`).
-Baaki laptops same Wi-Fi/router pe hon aur wo URL browser mein kholen. Frontend khud `http://<jis-host-se-page-khula>:8000` pe API dhoondhta hai, kuch config nahi chahiye.
+This generates a complete simulated cricket match, allowing you to see the charts immediately.
 
-Windows pe pehli baar firewall popup aaye to **Private network allow** karo, ya ports 5173 aur 8000 manually open karo.
+## Connecting 3–4 Laptops on the Same LAN
 
-Typical setup:
-- Laptop 1: server (Postgres + backend + frontend) + OBS (scoreboard + overlay browser sources)
-- Laptop 2: scorer (`/admin`)
-- Laptop 3: commentator (`/charts/:id`)
+Yes, multiple laptops can connect simultaneously.
 
-OBS mein Browser Source: `http://<ip>:5173/scoreboard/1?bg=transparent` (1920x1080) aur `http://<ip>:5173/overlay/1` (1920x1080).
+On the laptop running the server, execute:
 
-## Docker (deployment style)
 ```bash
-cp .env.example .env           # PIN aur DB password badlo
-docker compose up --build      # http://<laptop-ip>/  (port 80)
+python scripts/lan_ip.py
 ```
-nginx frontend serve karta hai aur `/api` + `/ws` backend ko proxy karta hai.
 
-## Tests
+The script prints the required URLs, for example:
+
+```text
+http://192.168.1.10:5173/admin
+```
+
+Other laptops must be connected to the same Wi-Fi network or router. They can then open the provided URL in their browsers.
+
+The frontend automatically detects the backend using the hostname from which the page was opened:
+
+```text
+http://<current-host>:8000
+```
+
+No additional configuration is required.
+
+**Windows Firewall:** When prompted for network access for the first time, allow access on Private Networks. Alternatively, manually open ports `5173` and `8000`.
+
+### Recommended Setup
+
+- **Laptop 1:** Server (PostgreSQL + Backend + Frontend) and OBS Studio (scoreboard and overlay browser sources).
+- **Laptop 2:** Scorer using `/admin`.
+- **Laptop 3:** Commentator using `/charts/:id`.
+
+### OBS Studio Configuration
+
+Add the following URLs as Browser Sources:
+
+**Scoreboard:**
+```text
+http://<ip>:5173/scoreboard/1?bg=transparent
+```
+
+Resolution: `1920 × 1080`
+
+**Chart Overlay:**
+```text
+http://<ip>:5173/overlay/1
+```
+
+Resolution: `1920 × 1080`
+
+## Docker Deployment
+
+For a deployment-style setup:
+
 ```bash
-cd backend && pytest -q
+cp .env.example .env
+
+# Update the PIN and database password.
+
+docker compose up --build
 ```
 
-## Cricket rules jo engine handle karta hai
-- Legal ball vs wide / no-ball (over 6 *legal* balls ka), wide pe batter ki ball nahi gini jati, no-ball pe gini jati hai
-- Bye / leg bye bowler ke naam nahi; wide / no-ball bowler ke naam
-- Strike rotation: odd runs, over end, wicket ke baad naya batter dismissed wale ke end pe
-- **Free hit** (no-ball ke baad): sirf run out / obstructing allowed
-- Wicket types + validation (bowled/caught/lbw/stumped/hit wicket sirf striker; wide pe sirf stumped/run out/hit wicket; no-ball pe sirf run out)
-- Bowler credit (run out bowler ko nahi milta), maidens, economy, strike rate, fall of wickets, partnerships
-- Same bowler do overs lagatar nahi
-- Innings end: all out / overs complete / target chase / early end (declare)
-- Result: runs se jeet, wickets se jeet, tie
-- Kisi bhi ball ko edit / delete karo, poora scorecard dobara calculate hota hai
+Application URL:
 
-## Limitations (honest list)
-- Chart overlay ki "on air" state server memory mein hai: server restart pe reset (match data safe rehta hai)
-- 4 aur 6 tab count hote hain jab bat se exactly 4/6 runs hon (overthrow ke 5/7 boundary nahi gine jate)
-- Super over aur DLS abhi nahi hain
-- DB migrations ke liye Alembic abhi add nahi hua (tables `create_all` se bante hain)
+```text
+http://<laptop-ip>/
+```
+
+The application runs on port `80`.
+
+Nginx serves the frontend and proxies `/api` and `/ws` requests to the backend.
+
+## Running Tests
+
+```bash
+cd backend
+
+pytest -q
+```
+
+## Cricket Rules Handled by the Scoring Engine
+
+The scoring engine handles the following cricket rules and calculations:
+
+1. **Legal Deliveries:** Correctly distinguishes legal balls from wides and no-balls. An over consists of six legal deliveries.
+2. **Ball Counting:** A wide does not count as a batter's ball faced, whereas a no-ball does.
+3. **Extras:** Byes and leg-byes are not credited to the bowler. Wides and no-balls are credited to the bowler.
+4. **Strike Rotation:** Handles odd-run rotation, strike changes at the end of an over, and the arrival of a new batter after a dismissal.
+5. **Free Hits:** After a no-ball, only permitted dismissal types, such as run-out and obstructing the field, are allowed.
+6. **Wicket Types and Validation:** Supports bowled, caught, LBW, stumped, hit wicket, and other applicable dismissal types, with validation based on the delivery type.
+   - Bowled, caught, LBW, stumped, and hit wicket apply to the striker.
+   - On a wide, only permitted dismissals such as stumped, run-out, and hit wicket are allowed.
+   - On a no-ball, only run-out is allowed.
+7. **Bowler Statistics:** Calculates bowler wickets, runs conceded, maidens, and economy rate. Run-outs are not credited to the bowler.
+8. **Batting Statistics:** Calculates strike rate, boundaries, and balls faced.
+9. **Fall of Wickets:** Tracks wickets and partnerships.
+10. **Bowler Restrictions:** Prevents the same bowler from bowling consecutive overs.
+11. **Innings Completion:** Handles all-out situations, completion of allocated overs, successful target chases, and early innings termination (declaration).
+12. **Match Results:** Determines wins by runs, wins by wickets, and tied matches.
+13. **Ball Editing:** Editing or deleting any delivery automatically recalculates the complete scorecard and related statistics.
+
+## Current Limitations
+
+The following limitations are currently acknowledged:
+
+- **Overlay Persistence:** The active chart selection is stored in server memory. It resets when the server restarts, although match data remains safe.
+- **Boundary Counting:** Fours and sixes are counted only when exactly 4 or 6 runs are scored from the bat. Overthrow boundaries resulting in 5 or 7 runs are not counted as fours or sixes.
+- **Super Overs and DLS:** Not currently supported.
+- **Database Migrations:** Alembic has not yet been integrated. Database tables are currently created using SQLAlchemy's `create_all()` method.
